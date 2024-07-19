@@ -253,12 +253,7 @@ public:
 };
 
 
-ClientBase::~ClientBase()
-{
-    writeSignalIDtoSignalPipe(SignalListener::StopThread);
-    signal_listener_thread.join();
-    HandledSignals::instance().reset();
-}
+ClientBase::~ClientBase() = default;
 
 ClientBase::ClientBase(
     int in_fd_,
