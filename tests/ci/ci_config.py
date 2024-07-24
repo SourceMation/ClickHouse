@@ -620,7 +620,6 @@ class CI:
         """
         get a list of all jobs for a workflow with configs
         """
-        jobs = []
         if is_mq:
             jobs = MQ_JOBS
         elif is_docs_only:
@@ -629,7 +628,7 @@ class CI:
             assert (
                 workflow_name in cls.WORKFLOW_CONFIGS
             ), "Workflow name if provided must be configured in WORKFLOW_CONFIGS"
-            jobs = cls.WORKFLOW_CONFIGS[workflow_name].run_jobs
+            jobs = list(cls.WORKFLOW_CONFIGS[workflow_name].run_jobs)
         else:
             # add all jobs
             jobs = list(cls.JOB_CONFIGS)
