@@ -1128,7 +1128,7 @@ def main() -> int:
 
         if IS_CI and not pr_info.is_merge_queue:
 
-            if pr_info.is_release:
+            if pr_info.is_master:
                 print("Release/master: CI Cache add pending records for all todo jobs")
                 ci_cache.push_pending_all(pr_info.is_release)
 
