@@ -96,6 +96,12 @@ def parse_args(parser: argparse.ArgumentParser) -> argparse.Namespace:
         help="Action that configures ci run. Calculates digests, checks job to be executed, generates json output",
     )
     parser.add_argument(
+        "--workflow",
+        default="",
+        type=str,
+        help="Workflow Name, to be provided with --configure for workflow-specific CI runs",
+    )
+    parser.add_argument(
         "--update-gh-statuses",
         action="store_true",
         help="Action that recreate success GH statuses for jobs that finished successfully in past and will be "
@@ -520,6 +526,7 @@ def _configure_jobs(
     pr_info: PRInfo,
     ci_settings: CiSettings,
     skip_jobs: bool,
+    workflow_name: str = "",
     dry_run: bool = False,
 ) -> CiCache:
     """
@@ -537,18 +544,27 @@ def _configure_jobs(
             is_docs_only=pr_info.has_changes_in_documentation_only(),
             is_master=pr_info.is_master,
             is_pr=pr_info.is_pr,
+            workflow_name=workflow_name,
         )
     else:
         job_configs = {}
 
-    # filter jobs in accordance with ci settings
-    job_configs = ci_settings.apply(
-        job_configs,
-        pr_info.is_release,
-        is_pr=pr_info.is_pr,
-        is_mq=pr_info.is_merge_queue,
-        labels=pr_info.labels,
-    )
+    if not workflow_name:
+        # filter jobs in accordance with ci settings
+        job_configs = ci_settings.apply(
+            job_configs,
+            pr_info.is_release,
+            is_pr=pr_info.is_pr,
+            is_mq=pr_info.is_merge_queue,
+            labels=pr_info.labels,
+        )
+
+    # add all job batches to job's to_do batches
+    for job, job_config in job_configs.items():
+        batches = []
+        for batch in range(job_config.num_batches):
+            batches.append(batch)
+        job_config.batches = batches
 
     # check jobs in ci cache
     ci_cache = CiCache.calc_digests_and_create(
@@ -1102,6 +1118,7 @@ def main() -> int:
             pr_info,
             ci_settings,
             args.skip_jobs,
+            args.workflow,
         )
 
         ci_cache.print_status()
