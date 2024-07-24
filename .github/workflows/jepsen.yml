@@ -41,7 +41,7 @@ jobs:
     needs: [RunConfig]
     uses: ./.github/workflows/reusable_test.yml
     with:
-      test_name: Jepsen keeper check
+      test_name: ClickHouse Keeper Jepsen
       runner_type: style-checker-aarch64
       data: ${{ needs.RunConfig.outputs.data }}
       run_command: |
@@ -51,7 +51,7 @@ jobs:
     needs: [RunConfig]
     uses: ./.github/workflows/reusable_test.yml
     with:
-      test_name: Jepsen server check
+      test_name: ClickHouse Server Jepsen
       runner_type: style-checker-aarch64
       data: ${{ needs.RunConfig.outputs.data }}
       run_command: |
